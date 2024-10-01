@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,14 +68,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun piano2() {
     val context = LocalContext.current
+    var isPiano by remember { mutableStateOf(true) } // Estado para rastrear si estamos en piano o guitarra
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1E1E1E)) // Fondo gris oscuro
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+            .padding(16.dp)
     ) {
         // Imagen decorativa en la parte superior
         Box(
@@ -84,41 +84,66 @@ fun piano2() {
                 .padding(16.dp)
                 .background(Color(0xFF424242), shape = RoundedCornerShape(100.dp)) // Gris metálico oscuro
                 .shadow(12.dp, shape = RoundedCornerShape(100.dp))
+                .align(Alignment.TopCenter) // Centra la imagen en la parte superior
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
+                painter = painterResource(id = R.drawable.img1),
                 contentDescription = "Logo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(180.dp)
             )
         }
 
-        // Teclas del piano
-        Row(
+        // Botón para alternar entre piano y guitarra en la parte superior derecha
+        Button(
+            onClick = { isPiano = !isPiano },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .align(Alignment.TopEnd) // Mover el botón a la parte superior derecha
+                .padding(8.dp)
         ) {
-            val sounds = listOf(
-                R.raw.doo, R.raw.re, R.raw.mi,
-                R.raw.fa, R.raw.sol, R.raw.la, R.raw.si
-            )
+            Text(text = if (isPiano) "Cambiar a Guitarra" else "Cambiar a Piano")
+        }
 
-            // Crear teclas mediante un bucle for
-            for (sound in sounds) {
-                PianoKey(context = context, soundResId = sound)
+        // Teclas del piano o cuerdas de guitarra, en la parte inferior
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 250.dp, bottom = 16.dp), // Da más espacio vertical para las teclas
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom // Coloca las teclas en la parte inferior
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                // Sonidos para piano y guitarra
+                val pianoSounds = listOf(R.raw.doo, R.raw.re, R.raw.mi, R.raw.fa, R.raw.sol, R.raw.la, R.raw.si)
+                val guitarSounds = listOf(R.raw.doo, R.raw.re, R.raw.mi, R.raw.fa, R.raw.sol, R.raw.la, R.raw.si)
+
+                // Seleccionar sonidos según el estado
+                val sounds = if (isPiano) pianoSounds else guitarSounds
+
+                // Crear teclas mediante un bucle for
+                for (sound in sounds) {
+                    PianoKey(context = context, soundResId = sound, isPiano = isPiano)
+                }
             }
         }
     }
 }
 
 @Composable
-fun PianoKey(context: android.content.Context, soundResId: Int) {
+fun PianoKey(context: android.content.Context, soundResId: Int, isPiano: Boolean) {
     var isPressed by remember { mutableStateOf(false) }
 
-    // Animación de cambio de color
-    val keyColor by animateColorAsState(if (isPressed) Color(0xFF00B0FF) else Color(0xFFE0E0E0)) // Azul claro al presionar, blanco suave normalmente
+    // Animación de cambio de color dependiendo de si es piano o guitarra
+    val keyColor by animateColorAsState(if (isPressed) {
+        if (isPiano) Color(0xFF00B0FF) else Color(0xFF8BC34A) // Azul claro para piano, verde claro para guitarra
+    } else {
+        Color(0xFFE0E0E0) // Blanco suave normalmente
+    })
 
     // Animación de sombra (elevación) que cambia cuando se presiona
     val shadowElevation by animateDpAsState(if (isPressed) 2.dp else 8.dp)
@@ -129,7 +154,7 @@ fun PianoKey(context: android.content.Context, soundResId: Int) {
     Box(
         modifier = Modifier
             .width(80.dp)
-            .height(160.dp)
+            .height(200.dp) // Hacemos las teclas más largas
             .background(keyColor, shape = RoundedCornerShape(16.dp))
             .clickable {
                 isPressed = true // Cambiar color al presionar
@@ -156,7 +181,7 @@ fun PianoKey(context: android.content.Context, soundResId: Int) {
                     .fillMaxSize()
                     .background(
                         brush = Brush.radialGradient(
-                            colors = listOf(Color.Transparent, Color(0xFF00B0FF)),
+                            colors = listOf(Color.Transparent, if (isPiano) Color(0xFF00B0FF) else Color(0xFF8BC34A)),
                             radius = 200f
                         ),
                         shape = RoundedCornerShape(16.dp)
