@@ -94,38 +94,16 @@ fun piano2(){
         }
     }
 }
-/*
-@Composable
-fun PianoKey(label: String, onClick: () -> Unit) {
-    // Cada caja (tecla) será un cuadrado con fondo y texto
-    // Cada tecla será una caja rectangular alargada
-    Box(
-        modifier = Modifier
-            .width(80.dp) // Ancho de las teclas
-            .height(160.dp) // Altura mediana
-            .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Esquinas redondeadas
-            .clickable { onClick() } // Acción clic
-            .padding(4.dp), // Pequeña separación interna
-        contentAlignment = Alignment.Center // Centrar el texto dentro de la tecla
-    ) {
 
-    }
-}
-*/
 @Composable
 fun PianoKey( ) {
-    // Estado para rastrear si la tecla está presionada o no
-    var isPressed by remember { mutableStateOf(false) }
-
-    // Cambiar color según si está presionado
-    val keyColor = if (isPressed) Color.Yellow else Color.White
 
     // Cada tecla será una caja rectangular redondeada
     Box(
         modifier = Modifier
             .width(80.dp) // Ancho de las teclas
             .height(160.dp) // Altura mediana
-            .background(color = keyColor, shape = RoundedCornerShape(16.dp)) // Cambiar color con esquinas redondeada
+            .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Cambiar color con esquinas redondeada
             .padding(4.dp), // Pequeña separación interna
         contentAlignment = Alignment.Center // Centrar el texto dentro de la tecla
     ) {
