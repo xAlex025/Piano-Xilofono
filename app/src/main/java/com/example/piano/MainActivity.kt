@@ -71,7 +71,7 @@ fun piano2() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black) // Fondo negro
+            .background(Color(0xFF1E1E1E)) // Fondo gris oscuro
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
@@ -82,7 +82,7 @@ fun piano2() {
             modifier = Modifier
                 .size(200.dp)
                 .padding(16.dp)
-                .background(Color.DarkGray, shape = RoundedCornerShape(100.dp))
+                .background(Color(0xFF424242), shape = RoundedCornerShape(100.dp)) // Gris metálico oscuro
                 .shadow(12.dp, shape = RoundedCornerShape(100.dp))
         ) {
             Image(
@@ -118,7 +118,7 @@ fun PianoKey(context: android.content.Context, soundResId: Int) {
     var isPressed by remember { mutableStateOf(false) }
 
     // Animación de cambio de color
-    val keyColor by animateColorAsState(if (isPressed) Color.Yellow else Color.White)
+    val keyColor by animateColorAsState(if (isPressed) Color(0xFF00B0FF) else Color(0xFFE0E0E0)) // Azul claro al presionar, blanco suave normalmente
 
     // Animación de sombra (elevación) que cambia cuando se presiona
     val shadowElevation by animateDpAsState(if (isPressed) 2.dp else 8.dp)
@@ -131,7 +131,7 @@ fun PianoKey(context: android.content.Context, soundResId: Int) {
             .width(80.dp)
             .height(160.dp)
             .background(keyColor, shape = RoundedCornerShape(16.dp))
-            .clickable { // Cambiar a clickable para respuesta inmediata
+            .clickable {
                 isPressed = true // Cambiar color al presionar
 
                 // Reproducir sonido
@@ -156,7 +156,7 @@ fun PianoKey(context: android.content.Context, soundResId: Int) {
                     .fillMaxSize()
                     .background(
                         brush = Brush.radialGradient(
-                            colors = listOf(Color.Transparent, Color.Yellow),
+                            colors = listOf(Color.Transparent, Color(0xFF00B0FF)),
                             radius = 200f
                         ),
                         shape = RoundedCornerShape(16.dp)
