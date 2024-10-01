@@ -1,11 +1,15 @@
 package com.example.piano
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,9 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,59 +64,108 @@ class MainActivity : ComponentActivity() {
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     piano2()
 }
-
-
 @Composable
-fun piano2(){
+fun piano2() {
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Black) // Fondo negro
-            .padding(16.dp), // Margen general
-        horizontalAlignment = Alignment.CenterHorizontally, // Alineación horizontal al centro
-        verticalArrangement = Arrangement.SpaceBetween // Espacio distribuido entre elementos
+            .background(Color.Black) // Fondo negro
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Imagen en la parte superior
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background), // Reemplaza con tu recurso de imagen
-            contentDescription = "Logo",
+        // Imagen decorativa en la parte superior
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(200.dp) // Tamaño de la imagen
-                .padding(top = 16.dp), // Margen superior
-            contentScale = ContentScale.Crop // Escalado para la imagen
-        )
+                .size(200.dp)
+                .padding(16.dp)
+                .background(Color.DarkGray, shape = RoundedCornerShape(100.dp))
+                .shadow(12.dp, shape = RoundedCornerShape(100.dp))
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_background),
+                contentDescription = "Logo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(180.dp)
+            )
+        }
 
-        // Teclas del piano en la parte inferior
+        // Teclas del piano
         Row(
             modifier = Modifier
-                .fillMaxWidth() // Ocupar todo el ancho
-                .padding(16.dp), // Separación entre las teclas y los bordes
-            horizontalArrangement = Arrangement.SpaceEvenly // Distribuir las teclas de manera uniforme
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            // Crear 7 teclas
-            for (i in 1..7) {
-                PianoKey()
+            val sounds = listOf(
+                R.raw.doo, R.raw.re, R.raw.mi,
+                R.raw.fa, R.raw.sol, R.raw.la, R.raw.si
+            )
+
+            // Crear teclas mediante un bucle for
+            for (sound in sounds) {
+                PianoKey(context = context, soundResId = sound)
             }
         }
     }
 }
 
 @Composable
-fun PianoKey( ) {
+fun PianoKey(context: android.content.Context, soundResId: Int) {
+    var isPressed by remember { mutableStateOf(false) }
 
-    // Cada tecla será una caja rectangular redondeada
+    // Animación de cambio de color
+    val keyColor by animateColorAsState(if (isPressed) Color.Yellow else Color.White)
+
+    // Animación de sombra (elevación) que cambia cuando se presiona
+    val shadowElevation by animateDpAsState(if (isPressed) 2.dp else 8.dp)
+
+    // MediaPlayer para reproducir el sonido
+    var mediaPlayer: MediaPlayer? = null
+
     Box(
         modifier = Modifier
-            .width(80.dp) // Ancho de las teclas
-            .height(160.dp) // Altura mediana
-            .background(color = Color.White, shape = RoundedCornerShape(16.dp)) // Cambiar color con esquinas redondeada
-            .padding(4.dp), // Pequeña separación interna
-        contentAlignment = Alignment.Center // Centrar el texto dentro de la tecla
-    ) {
+            .width(80.dp)
+            .height(160.dp)
+            .background(keyColor, shape = RoundedCornerShape(16.dp))
+            .clickable { // Cambiar a clickable para respuesta inmediata
+                isPressed = true // Cambiar color al presionar
 
+                // Reproducir sonido
+                mediaPlayer = MediaPlayer.create(context, soundResId)
+                mediaPlayer?.start()
+
+                // Liberar el MediaPlayer después de reproducir
+                mediaPlayer?.setOnCompletionListener {
+                    mediaPlayer?.release()
+                    mediaPlayer = null
+                    isPressed = false // Volver al color original al terminar
+                }
+            }
+            .shadow(shadowElevation, RoundedCornerShape(16.dp))
+            .padding(4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // Resplandor visual cuando está presionado (opcional)
+        if (isPressed) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color.Transparent, Color.Yellow),
+                            radius = 200f
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            )
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
