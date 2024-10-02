@@ -107,7 +107,7 @@ fun piano2() {
             )
         }
 
-        // Imagen decorativa en la parte superior
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
