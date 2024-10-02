@@ -118,7 +118,7 @@ fun piano2() {
                 .align(Alignment.TopCenter)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.img1),
+                painter = painterResource(id = R.drawable.img2),
                 contentDescription = "Logo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(180.dp)
