@@ -189,40 +189,32 @@ fun PianoKey(context: android.content.Context, soundResId: Int, isPiano: Boolean
             .width(80.dp)
             .height(200.dp) // Hacemos las teclas más largas
             .background(keyColor, shape = RoundedCornerShape(16.dp))
-            .clickable {
-                isPressed = true // Cambiar color al presionar
+            .clickable(
+                onClick = {
+                    // Cambiar el estado de la tecla al presionar
+                    isPressed = true
 
-                // Reproducir sonido
-                mediaPlayer = MediaPlayer.create(context, soundResId)
-                mediaPlayer?.start()
+                    // Reproducir sonido
+                    mediaPlayer = MediaPlayer.create(context, soundResId)
+                    mediaPlayer?.start()
 
-                // Liberar el MediaPlayer después de reproducir
-                mediaPlayer?.setOnCompletionListener {
-                    mediaPlayer?.release()
-                    mediaPlayer = null
-                    isPressed = false // Volver al color original al terminar
+                    // Restablecer el estado cuando termine la reproducción del sonido
+                    mediaPlayer?.setOnCompletionListener {
+                        it.release() // Liberar el recurso de MediaPlayer
+                        mediaPlayer = null
+                        isPressed = false // Asegurar que el estado se restablezca al finalizar el sonido
+                    }
+
                 }
-            }
+            )
             .shadow(shadowElevation, RoundedCornerShape(16.dp))
             .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Resplandor visual cuando está presionado (opcional)
-        if (isPressed) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Color.Transparent, if (isPiano) Color(0xFF00B0FF) else Color(0xFF8BC34A)),
-                            radius = 200f
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-            )
-        }
+
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
