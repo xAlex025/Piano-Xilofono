@@ -78,7 +78,7 @@ fun piano2() {
             .background(Color(0xFF1E1E1E))
             .padding(16.dp)
     ) {
-        // Título a la izquierda en la parte superior
+
         Column(
             modifier = Modifier
                 .align(Alignment.TopStart)
