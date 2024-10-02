@@ -33,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -44,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.piano.ui.theme.PianoTheme
+import androidx.compose.ui.text.TextStyle
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,16 +80,34 @@ fun piano2() {
             .background(Color(0xFF1E1E1E)) // Fondo gris oscuro
             .padding(16.dp)
     ) {
-        // Título a la izquierda
-        Text(
-            text = "Piano App",
+        // Título a la izquierda en la parte superior
+        Column(
             modifier = Modifier
-                .align(Alignment.CenterStart) // Alinear a la izquierda
-                .padding(start = 16.dp), // Espacio adicional a la izquierda
-            fontSize = 32.sp, // Tamaño de la fuente
-            fontWeight = FontWeight.Bold, // Peso de la fuente
-            color = Color.White // Color del texto
-        )
+                .align(Alignment.TopStart) // Alinear a la parte superior izquierda
+                .padding(start = 16.dp, top = 16.dp), // Espacio adicional a la izquierda y en la parte superior
+            verticalArrangement = Arrangement.Top // Alinear verticalmente hacia arriba
+        ) {
+            Text(
+                text = "Piano",
+                fontSize = 48.sp, // Tamaño de la fuente grande
+                fontWeight = FontWeight.Bold, // Peso de la fuente
+                color = Color(0xFF00B0FF), // Color azul brillante
+                style = TextStyle(
+                    shadow = Shadow(
+                        color = Color.Black.copy(alpha = 0.3f),
+                        offset = Offset(4f, 4f),
+                        blurRadius = 4f
+                    )
+                )
+            )
+
+            Text(
+                text = "App",
+                fontSize = 32.sp, // Tamaño de la fuente más pequeño
+                fontWeight = FontWeight.Light, // Peso de la fuente más ligero
+                color = Color.White // Color del texto
+            )
+        }
 
         // Imagen decorativa en la parte superior
         Box(
@@ -110,7 +131,7 @@ fun piano2() {
         Button(
             onClick = { isPiano = !isPiano },
             modifier = Modifier
-                .align(Alignment.CenterEnd) // Mover el botón a la parte superior derecha
+                .align(Alignment.TopEnd) // Mover el botón a la parte superior derecha
                 .padding(8.dp)
         ) {
             Text(text = if (isPiano) "Cambiar a Guitarra" else "Cambiar a Piano")
@@ -202,8 +223,6 @@ fun PianoKey(context: android.content.Context, soundResId: Int, isPiano: Boolean
         }
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
