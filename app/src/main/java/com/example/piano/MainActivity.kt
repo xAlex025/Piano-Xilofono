@@ -39,6 +39,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,6 +77,17 @@ fun piano2() {
             .background(Color(0xFF1E1E1E)) // Fondo gris oscuro
             .padding(16.dp)
     ) {
+        // Título a la izquierda
+        Text(
+            text = "Piano App",
+            modifier = Modifier
+                .align(Alignment.CenterStart) // Alinear a la izquierda
+                .padding(start = 16.dp), // Espacio adicional a la izquierda
+            fontSize = 32.sp, // Tamaño de la fuente
+            fontWeight = FontWeight.Bold, // Peso de la fuente
+            color = Color.White // Color del texto
+        )
+
         // Imagen decorativa en la parte superior
         Box(
             contentAlignment = Alignment.Center,
@@ -98,7 +110,7 @@ fun piano2() {
         Button(
             onClick = { isPiano = !isPiano },
             modifier = Modifier
-                .align(Alignment.TopEnd) // Mover el botón a la parte superior derecha
+                .align(Alignment.CenterEnd) // Mover el botón a la parte superior derecha
                 .padding(8.dp)
         ) {
             Text(text = if (isPiano) "Cambiar a Guitarra" else "Cambiar a Piano")
@@ -190,6 +202,7 @@ fun PianoKey(context: android.content.Context, soundResId: Int, isPiano: Boolean
         }
     }
 }
+
 
 
 @Preview(showBackground = true)
