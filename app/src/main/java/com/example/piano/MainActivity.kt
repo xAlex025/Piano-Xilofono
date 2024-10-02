@@ -10,7 +10,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -72,7 +70,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun piano2() {
     val context = LocalContext.current
-    var isPiano by remember { mutableStateOf(true) } // Estado para rastrear si estamos en piano o guitarra
+    var Piano by remember { mutableStateOf(true) } // Estado para rastrear si estamos en piano o guitarra
 
     Box(
         modifier = Modifier
@@ -88,7 +86,7 @@ fun piano2() {
             verticalArrangement = Arrangement.Top // Alinear verticalmente hacia arriba
         ) {
             Text(
-                text = "Piano",
+                text = "Aplicacion",
                 fontSize = 48.sp, // Tamaño de la fuente grande
                 fontWeight = FontWeight.Bold, // Peso de la fuente
                 color = Color(0xFF00B0FF), // Color azul brillante
@@ -102,7 +100,7 @@ fun piano2() {
             )
 
             Text(
-                text = "App",
+                text = "Piano",
                 fontSize = 32.sp, // Tamaño de la fuente más pequeño
                 fontWeight = FontWeight.Light, // Peso de la fuente más ligero
                 color = Color.White // Color del texto
@@ -129,12 +127,12 @@ fun piano2() {
 
         // Botón para alternar entre piano y guitarra en la parte superior derecha
         Button(
-            onClick = { isPiano = !isPiano },
+            onClick = { Piano = !Piano },
             modifier = Modifier
                 .align(Alignment.TopEnd) // Mover el botón a la parte superior derecha
                 .padding(8.dp)
         ) {
-            Text(text = if (isPiano) "Cambiar a Guitarra" else "Cambiar a Piano")
+            Text(text = if (Piano) "Cambiar a Xilofono" else "Cambiar a Piano")
         }
 
         // Teclas del piano o cuerdas de guitarra, en la parte inferior
@@ -152,62 +150,66 @@ fun piano2() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 // Sonidos para piano y guitarra
-                val pianoSounds = listOf(R.raw.doo, R.raw.re, R.raw.mi, R.raw.fa, R.raw.sol, R.raw.la, R.raw.si)
-                val guitarSounds = listOf(R.raw.doo, R.raw.re, R.raw.mi, R.raw.fa, R.raw.sol, R.raw.la, R.raw.si)
+                val sonidosPiano = listOf(R.raw.doo, R.raw.re, R.raw.mi, R.raw.fa, R.raw.sol, R.raw.la, R.raw.si)
+                val sonidosXilofono = listOf(R.raw.xylophone_a3, R.raw.xylophone_b3, R.raw.xylophone_c3, R.raw.xylophone_d3, R.raw.xylophone_e3, R.raw.xylophone_f3, R.raw.xylophone_g3)
 
                 // Seleccionar sonidos según el estado
-                val sounds = if (isPiano) pianoSounds else guitarSounds
+                val sonidos = if (Piano) sonidosPiano else sonidosXilofono
 
                 // Crear teclas mediante un bucle for
-                for (sound in sounds) {
-                    PianoKey(context = context, soundResId = sound, isPiano = isPiano)
+                for (sonido in sonidos) {
+                    teclaPiano(contexto = context, idSonido = sonido, Piano = Piano)
                 }
             }
         }
     }
 }
-
 @Composable
-fun PianoKey(context: android.content.Context, soundResId: Int, isPiano: Boolean) {
-    var isPressed by remember { mutableStateOf(false) }
+fun teclaPiano(contexto: android.content.Context, idSonido: Int, Piano: Boolean) {
+    var esPulsado by remember { mutableStateOf(false) }
 
     // Animación de cambio de color dependiendo de si es piano o guitarra
-    val keyColor by animateColorAsState(if (isPressed) {
-        if (isPiano) Color(0xFF00B0FF) else Color(0xFF8BC34A) // Azul claro para piano, verde claro para guitarra
-    } else {
-        Color(0xFFE0E0E0) // Blanco suave normalmente
-    })
+    val colorTeclas by animateColorAsState(
+        if (esPulsado) {
+            if (Piano) Color(0xFF00B0FF) else Color(0xFF8BC34A) // Azul claro para piano, verde claro para guitarra
+        } else {
+            Color(0xFFE0E0E0) // Blanco suave normalmente
+        }
+    )
 
     // Animación de sombra (elevación) que cambia cuando se presiona
-    val shadowElevation by animateDpAsState(if (isPressed) 2.dp else 8.dp)
+    val sombra by animateDpAsState(targetValue = if (esPulsado) 2.dp else 8.dp)
 
-    // MediaPlayer para reproducir el sonido
-    var mediaPlayer: MediaPlayer? = null
+    // Controlar cuando la tecla se libera automáticamente
+    LaunchedEffect(esPulsado) {
+        if (esPulsado) {
+            // Forzar un retraso de "liberación" visual después de un tiempo corto
+            kotlinx.coroutines.delay(300L) // Ajustar este valor si es necesario
+            esPulsado = false // Restablecer el estado de la tecla
+        }
+    }
 
     Box(
         modifier = Modifier
             .width(80.dp)
-            .height(200.dp) // Hacemos las teclas más largas
-            .background(keyColor, shape = RoundedCornerShape(16.dp))
+            .height(200.dp)
+            .background(colorTeclas, shape = RoundedCornerShape(16.dp))
             .clickable(
                 onClick = {
-                    // Cambiar el estado de la tecla al presionar
-                    isPressed = true
+                    esPulsado = true // Cambiar el estado de la tecla al presionar
 
                     // Reproducir sonido
-                    mediaPlayer = MediaPlayer.create(context, soundResId)
-                    mediaPlayer?.start()
+                    val mediaPlayer = MediaPlayer.create(contexto, idSonido)
+                    mediaPlayer.start()
 
                     // Restablecer el estado cuando termine la reproducción del sonido
-                    mediaPlayer?.setOnCompletionListener {
-                        it.release() // Liberar el recurso de MediaPlayer
-                        mediaPlayer = null
-                        isPressed = false // Asegurar que el estado se restablezca al finalizar el sonido
-                    }
+                    mediaPlayer.setOnCompletionListener {
+                        mediaPlayer.release()
 
+                    }
                 }
             )
-            .shadow(shadowElevation, RoundedCornerShape(16.dp))
+            .shadow(sombra, RoundedCornerShape(16.dp))
             .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
