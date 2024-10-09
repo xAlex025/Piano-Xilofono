@@ -174,22 +174,19 @@ fun piano2() {
 fun teclaPiano(contexto: android.content.Context, idSonido: Int, Piano: Boolean,   nota: String) {
     var esPulsado by remember { mutableStateOf(false) }
 
-
     val colorTeclas by animateColorAsState(
         if (esPulsado) {
             if (Piano) Color(0xFF00B0FF) else Color(0xFF8BC34A)
         } else {
-            Color(0xFFE0E0E0)
+           Color(0xFFE0E0E0)
         }
     )
 
-
+    val formaTecla = if (Piano) RoundedCornerShape(16.dp) else RoundedCornerShape(4.dp)
     val sombra by animateDpAsState(targetValue = if (esPulsado) 2.dp else 8.dp)
-
 
     LaunchedEffect(esPulsado) {
         if (esPulsado) {
-
             kotlinx.coroutines.delay(300L)
             esPulsado = false
         }
@@ -197,24 +194,21 @@ fun teclaPiano(contexto: android.content.Context, idSonido: Int, Piano: Boolean,
 
     Box(
         modifier = Modifier
-            .width(80.dp)
-            .height(200.dp)
-            .background(colorTeclas, shape = RoundedCornerShape(16.dp))
+            .width(if (Piano) 80.dp else 60.dp)
+            .height(if (Piano) 200.dp else 160.dp)
+            .background(colorTeclas, shape = formaTecla)
             .clickable(
                 onClick = {
                     esPulsado = true
-
-
                     val mediaPlayer = MediaPlayer.create(contexto, idSonido)
                     mediaPlayer.start()
 
                     mediaPlayer.setOnCompletionListener {
                         mediaPlayer.release()
-
                     }
                 }
             )
-            .shadow(sombra, RoundedCornerShape(16.dp))
+            .shadow(sombra, formaTecla)
             .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -226,7 +220,6 @@ fun teclaPiano(contexto: android.content.Context, idSonido: Int, Piano: Boolean,
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
